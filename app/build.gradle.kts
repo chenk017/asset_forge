@@ -4,6 +4,10 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+val withFmod = providers.gradleProperty("withFmod")
+    .map { it.toBoolean() }
+    .getOrElse(false)
+
 android {
     namespace = "com.elfilibustero.uabe"
     compileSdk {
@@ -118,7 +122,9 @@ dependencies {
     implementation(project(":astc_encoder"))
     implementation(project(":etcpak"))
     implementation(project(":f3d"))
-    implementation(project(":fmod"))
+    if (withFmod) {
+        implementation(project(":fmod"))
+    }
     implementation(project(":texture2ddecoder"))
 
     testImplementation(libs.junit)
@@ -150,7 +156,9 @@ chaquopy {
             srcDir("${rootDir}/third_party/UnityPy")
             srcDir("${rootDir}/astc_encoder/src/main/python")
             srcDir("${rootDir}/etcpak/src/main/python")
-            srcDir("${rootDir}/fmod/src/main/python")
+            if (withFmod) {
+                srcDir("${rootDir}/fmod/src/main/python")
+            }
             srcDir("${rootDir}/texture2ddecoder/src/main/python")
         }
     }

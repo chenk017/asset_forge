@@ -23,6 +23,8 @@ rootProject.name = "UABE Android"
 include(":app")
 include(":astc_encoder")
 include(":f3d")
-include(":fmod")
+if (providers.gradleProperty("withFmod").orNull == "true") {
+    include(":fmod")
+}
 include(":texture2ddecoder")
 include(":etcpak")
