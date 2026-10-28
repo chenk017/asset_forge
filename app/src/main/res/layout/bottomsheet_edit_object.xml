@@ -68,7 +68,7 @@
         android:layout_height="match_parent"
         android:visibility="gone">
 
-        <com.elfilibustero.f3d.MainView
+        <com.elfilibustero.uabe.ui.MeshPreviewView
             android:id="@+id/model"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -16,8 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.elfilibustero.f3d.F3dNative;
-import com.elfilibustero.f3d.MainView;
 import com.elfilibustero.uabe.R;
 import com.elfilibustero.uabe.databinding.BottomsheetEditObjectBinding;
 import com.elfilibustero.uabe.python.repo.ObjectData;
@@ -128,15 +126,6 @@ public class EditObjectBottomSheet extends BottomSheetDialogFragment {
     private void loadDataOnly() {
         setLoading(true, "Loading…");
 
-        if ("Mesh".equals(type)) {
-            if (!F3dNative.isAvailable(requireContext())) {
-                Toast.makeText(requireContext(),
-                        "Not supported on this device",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
         unityPyRepository.getObjectData(sessionId, idx)
                 .addOnSuccessListener(result -> {
                     switch (type) {
@@ -176,34 +165,36 @@ public class EditObjectBottomSheet extends BottomSheetDialogFragment {
         b.txt2dContainer.setVisibility(View.GONE);
         b.btnSave.setVisibility(View.GONE);
         b.modelContainer.setVisibility(View.VISIBLE);
-        io.execute(() -> {
-            Context ctx = requireContext();
-            File tmp = new File(ctx.getCacheDir(), "preview.obj");
-            try {
-                Files.write(tmp.toPath(), data.getData());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            main.post(() -> {
-                setLoading(false, "Preview");
-                if (tmp.exists()) {
-                    b.model.updateFilePath(tmp.getAbsolutePath());
-                    b.model.setOnLoadSceneListener(new MainView.OnLoadSceneListener() {
-                        @Override
-                        public void onLoadScene(String path) {
-                            //noinspection ResultOfMethodCallIgnored
-                            tmp.delete();
-                        }
+        setLoading(true, "Preparing Mesh preview…");
 
-                        @Override
-                        public void onLoadFailed(String path, Throwable t) {
-                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(),
-                                    getString(R.string.message_preview_failed_add, t.getMessage()),
-                                    Toast.LENGTH_SHORT).show());
-                        }
-                    });
+        io.execute(() -> {
+            try {
+                byte[] objData = data.getData();
+                if (objData == null || objData.length == 0) {
+                    throw new IllegalArgumentException("Mesh OBJ data is empty");
                 }
-            });
+
+                main.post(() -> {
+                    if (!isAdded() || b == null) return;
+                    try {
+                        b.model.setObjData(objData);
+                        setLoading(false, "Preview");
+                    } catch (Throwable t) {
+                        setLoading(false, null);
+                        Toast.makeText(requireContext(),
+                                "Mesh preview failed: " + t.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Throwable t) {
+                main.post(() -> {
+                    if (!isAdded() || b == null) return;
+                    setLoading(false, null);
+                    Toast.makeText(requireContext(),
+                            "Mesh preview failed: " + t.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
+            }
         });
     }
 
