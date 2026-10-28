@@ -1,3 +1,4 @@
+
 name: Asset Forge Android APK
 
 on:
@@ -32,11 +33,9 @@ jobs:
           python-version: '3.10'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK licenses
-        run: |
-          yes | sdkmanager --licenses || true
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
 
       - name: Install Android SDK and NDK
         run: |
@@ -62,3 +61,4 @@ jobs:
           name: asset-forge-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          
