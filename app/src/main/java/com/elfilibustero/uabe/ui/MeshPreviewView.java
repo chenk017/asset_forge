@@ -32,7 +32,7 @@ public final class MeshPreviewView extends GLSurfaceView {
     }
 
     public MeshPreviewView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        super(context, attrs);
         meshRenderer = initializeRenderer();
     }
 
