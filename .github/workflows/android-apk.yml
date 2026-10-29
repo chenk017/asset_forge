@@ -21,6 +21,32 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Fetch UnityPy Git LFS resources
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+          git -C third_party/UnityPy lfs pull
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path(
+              "third_party/UnityPy/UnityPy/resources/lzma.tpk"
+          )
+          data = path.read_bytes()
+
+          print(f"TPK size: {len(data)} bytes")
+          print(f"TPK header: {data[:16].hex(' ')}")
+
+          if data[:4] != b"TPK*":
+              raise SystemExit(
+                  "ERROR: UnityPy lzma.tpk is not the real TPK binary"
+              )
+
+          print("OK: UnityPy TPK resource is valid")
+          PY
+
       - name: Apply temporary UnityPy TPK diagnostic patch
         run: |
           git -C third_party/UnityPy apply "$GITHUB_WORKSPACE/unitypy-tpk-diagnostic.patch"
