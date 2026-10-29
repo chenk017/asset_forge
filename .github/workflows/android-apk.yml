@@ -21,6 +21,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Apply temporary UnityPy TPK diagnostic patch
+        run: |
+          git -C third_party/UnityPy apply "$GITHUB_WORKSPACE/unitypy-tpk-diagnostic.patch"
+          git -C third_party/UnityPy diff --check
+          git -C third_party/UnityPy diff -- UnityPy/helpers/Tpk.py
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:

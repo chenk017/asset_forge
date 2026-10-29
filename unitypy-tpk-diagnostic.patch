@@ -1,0 +1,21 @@
+diff --git a/UnityPy/helpers/Tpk.py b/UnityPy/helpers/Tpk.py
+index 2f2f896..8056615 100644
+--- a/UnityPy/helpers/Tpk.py
++++ b/UnityPy/helpers/Tpk.py
+@@ -153,7 +153,15 @@ class TpkFile:
+             self.UncompressedSize,
+         ) = TpkFile.Struct.unpack(stream.read(TpkFile.Struct.size))
+         if magic != TpkFile.TpkMagicBytes:
+-            raise Exception("Invalid TPK magic bytes")
++            stream.seek(0)
++            header = stream.read(16)
++            raise Exception(
++                "Invalid TPK magic bytes: "
++                f"magic=0x{magic:08x}, "
++                f"expected=0x{TpkFile.TpkMagicBytes:08x}, "
++                f"header={header.hex()}, "
++                f"stream_size={len(stream.getbuffer())}"
++            )
+         if versionNumber != TpkFile.TpkVersionNumber:
+             raise Exception("Invalid TPK version number")
+         self.CompressionType = TpkCompressionType(compressionType)
