@@ -53,6 +53,12 @@ jobs:
           git -C third_party/UnityPy diff --check
           git -C third_party/UnityPy diff -- UnityPy/helpers/Tpk.py
 
+      - name: Apply UnityPy optional FMOD patch
+        run: |
+          python3 "$GITHUB_WORKSPACE/apply-unitypy-fmod-optional.py"
+          git -C third_party/UnityPy diff --check
+          git -C third_party/UnityPy diff -- UnityPy/export/AudioClipConverter.py
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
